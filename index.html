@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gradio API Integration</title>
+    <style>
+        /* Basic reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body and container styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            padding: 20px;
+        }
+
+        /* Header styling */
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 2em;
+            color: #4CAF50;
+        }
+
+        header p {
+            font-size: 1.2em;
+            color: #555;
+        }
+
+        /* Input field and button */
+        .api-key-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .api-key-container input {
+            padding: 10px;
+            font-size: 1em;
+            width: 300px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .api-key-container button {
+            padding: 10px 15px;
+            font-size: 1em;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .api-key-container button:hover {
+            background-color: #45a049;
+        }
+
+        /* Gradio container */
+        .gradio-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Footer styling */
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 1em;
+            color: #777;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.5em;
+            }
+
+            header p {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Gradio API Integration</h1>
+        <p>Integrating OpenAI Whisper via Gradio API</p>
+        <p id="api-note">Please enter your Hugging Face API key to use this service. <a href="https://huggingface.co/docs/huggingface_hub/quick-start#2-login" target="_blank">Get an API Key</a>.</p>
+    </header>
+
+    <!-- API key input field -->
+    <div class="api-key-container">
+        <input type="text" id="api-key" placeholder="Enter your Hugging Face API key" />
+        <button onclick="setApiKey()">Submit</button>
+    </div>
+
+    <!-- Gradio app integration -->
+    <div class="gradio-container" id="gradio-container" style="display: none;">
+        <script type="module" src="https://gradio.s3-us-west-2.amazonaws.com/3.38.0/gradio.js"></script>
+        <gradio-app id="gradio-app" src=""></gradio-app>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 Your Company Name</p>
+    </footer>
+
+    <script>
+        // Function to handle the API key submission
+        function setApiKey() {
+            const apiKey = document.getElementById("api-key").value.trim();
+
+            if (apiKey) {
+                // Store the API key in localStorage
+                localStorage.setItem("hfApiKey", apiKey);
+
+                // Show the Gradio app and hide the API input
+                document.getElementById("api-note").innerHTML = "Your API key is set. You can now use the service.";
+                document.getElementById("gradio-container").style.display = "flex";
+
+                // Initialize the Gradio app with the user's API key
+                initializeGradioApp(apiKey);
+            } else {
+                // Show an error message if no key is provided
+                document.getElementById("api-note").innerHTML = "You must provide an API key. Redirecting to Hugging Face's page...";
+                setTimeout(function() {
+                    window.location.href = "https://huggingface.co/docs/huggingface_hub/quick-start#2-login";
+                }, 3000);
+            }
+        }
+
+        // Function to initialize the Gradio app with the provided API key
+        function initializeGradioApp(apiKey) {
+            const gradioApp = document.getElementById("gradio-app");
+            gradioApp.setAttribute("src", `https://openai-whisper.hf.space?api_key=${apiKey}`);
+        }
+
+        // On page load, check if the API key is already saved
+        window.onload = function() {
+            const savedApiKey = localStorage.getItem("hfApiKey");
+            if (savedApiKey) {
+                document.getElementById("api-note").innerHTML = "Your API key is already set.";
+                document.getElementById("gradio-container").style.display = "flex";
+                initializeGradioApp(savedApiKey);
+            }
+        };
+    </script>
+</body>
+</html>
